@@ -1,0 +1,346 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bgContrast: #f9f9f9;
+}
+
+
+@layer theme {
+  .dark {
+    --color-bgContrast: #66c8b6;
+  }
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-bgContrast: #f9f9f9;
+}
+
+@layer theme {
+  .dark {
+    --color-bgContrast: #66c8b6;
+  }
+}
+
+@theme {
+  /* Custom colors */
+  --color-primary: #d3790d;
+
+  /* Font families */
+  --font-family-dm: "DM Sans", sans-serif;
+  --font-family-exo: "Exo", sans-serif;
+
+  /* Container settings */
+  --container-center: true;
+  --breakpoint-2xl: 1400px;
+
+  /* Custom color palette */
+  --color-dark: #000000;
+  --color-dark-200: #0d0f10;
+  --color-dark-300: #131619;
+  --color-dark-400: #1a1d21;
+  --color-dark-500: #363a3d;
+  --color-dark-600: #76828d;
+  --color-dark-700: #abb8c4;
+
+  --color-green-500: #74ae3c;
+  --color-green-600: #0d2a1f;
+
+  /* Border radius */
+  --radius: 0.5rem;
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  /* Animations */
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-zoom-in-out: zoom-in-out 2s infinite;
+  --animate-caret-blink: caret-blink 1.25s ease-out infinite;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    /* Custom theme variables for LottoNowNow */
+    --brand-primary: 29 85% 44%; /* #D3790D */
+    --brand-secondary: 13 79% 42%; /* #B83E1D */
+    --brand-accent: 36 76% 41%; /* #C2870F */
+
+    /* Light mode specific */
+    --surface: 0 0% 100%;
+    --surface-secondary: 0 0% 98%;
+    --surface-tertiary: 0 0% 96%;
+    --text-primary: 222.2 84% 4.9%;
+    --text-secondary: 215.4 16.3% 46.9%;
+    --text-tertiary: 215.4 16.3% 65.1%;
+    --border-light: 214.3 31.8% 91.4%;
+    --shadow: 220 13% 91%;
+
+    /* Status colors */
+    --success: 142 76% 36%;
+    --success-bg: 138 76% 97%;
+    --warning: 45 93% 47%;
+    --warning-bg: 48 100% 96%;
+    --error: 0 84% 60%;
+    --error-bg: 0 93% 97%;
+    --info: 221 83% 53%;
+    --info-bg: 214 95% 97%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+
+    /* Dark mode specific adjustments */
+    --brand-primary: 36 82% 56%; /* Brighter #E8941F for dark mode */
+    --brand-secondary: 29 85% 44%; /* #D3790D */
+    --brand-accent: 42 96% 50%; /* #F5A623 */
+
+    /* Dark mode surfaces */
+    --surface: 222.2 84% 4.9%;
+    --surface-secondary: 217.2 32.6% 17.5%;
+    --surface-tertiary: 215 27.9% 16.9%;
+    --text-primary: 210 40% 98%;
+    --text-secondary: 215 20.2% 65.1%;
+    --text-tertiary: 215.4 16.3% 46.9%;
+    --border-light: 217.2 32.6% 17.5%;
+    --shadow: 0 0% 0%;
+
+    /* Dark mode status colors */
+    --success: 142 71% 45%;
+    --success-bg: 142 76% 6%;
+    --warning: 48 96% 53%;
+    --warning-bg: 48 100% 6%;
+    --error: 0 91% 71%;
+    --error-bg: 0 93% 6%;
+    --info: 199 89% 48%;
+    --info-bg: 214 95% 6%;
+  }
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@keyframes zoom-in-out {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes caret-blink {
+  0%,
+  70%,
+  100% {
+    opacity: 1;
+  }
+  20%,
+  50% {
+    opacity: 0;
+  }
+}
+
+@layer utilities {
+  .container {
+    @apply relative flex-1 overflow-y-auto;
+  }
+
+  .header {
+    @apply text-[32px] font-bold leading-[42.53px];
+  }
+
+  .game-create-con {
+    @apply flex justify-start flex-col md:flex-row md:space-x-20 md:items-start pt-5 w-full border-b pb-5;
+  }
+
+  .sub-container {
+    @apply mx-auto flex size-full flex-col;
+  }
+
+  .side-img {
+    @apply hidden h-full object-fill md:block;
+  }
+
+  .shad-input {
+    @apply w-full dark:text-white placeholder:text-[#667085] border-[#D0D5DD] h-11 focus-visible:ring-0 focus-visible:ring-offset-0;
+  }
+
+  .checkbox-label {
+    @apply cursor-pointer text-xs font-bold text-[#282846] peer-disabled:cursor-not-allowed peer-disabled:opacity-70 md:leading-none;
+  }
+
+  .input-phone {
+    @apply h-11 rounded-md px-3 text-sm border bg-[#ffffff] focus-visible:ring-0;
+  }
+
+  /* Chrome, Safari, Edge, Opera */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox */
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+
+  /* React Date Picker border removal */
+  .react-date-picker__wrapper {
+    border: none;
+    outline: none;
+  }
+
+  .react-date-picker__inputGroup {
+    border: none;
+    outline: none;
+  }
+
+  .react-date-picker__inputGroup__input {
+    border: none;
+    outline: none;
+    box-shadow: none;
+  }
+
+  .react-date-picker__inputGroup__input:focus {
+    border: none;
+    outline: none;
+    box-shadow: none;
+  }
+
+  .react-date-picker__inputGroup__divider {
+    border: none;
+    color: #9ca3af;
+  }
+
+  .react-date-picker {
+    border: none;
+    outline: none;
+  }
+}
+
+/* New Hero Animations */
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-gradient {
+  animation: gradient 3s ease infinite;
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 2s ease-in-out infinite;
+}
+
+.bg-300\% {
+  background-size: 300%;
+}
+
+/* Slide-in animation */
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.5s ease-out forwards;
+}
