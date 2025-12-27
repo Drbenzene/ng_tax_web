@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react';
-import { MonitorDot, MessageCircle, Sparkles, Shield, Clock, FileText, Calculator, TrendingUp, CheckCircle, Menu, ChevronRight, Zap, Users, Award, Star, ArrowRight, Check, Play, BarChart3, Building2, User, Wallet, Globe, Lock, HeadphonesIcon, TrendingDown, Receipt, BookOpen, Download, X } from 'lucide-react';
+import { Send, Link2, CreditCard, Smartphone, MonitorDot, MessageCircle, Sparkles, Shield, Clock, FileText, Calculator, TrendingUp, CheckCircle, Menu, ChevronRight, Zap, Users, Award, Star, ArrowRight, Check, Play, BarChart3, Building2, User, Wallet, Globe, Lock, HeadphonesIcon, TrendingDown, Receipt, BookOpen, Download, X } from 'lucide-react';
 import Faq from '@/components/landing/Faq';
 import Hero from '@/components/landing/Hero';
 import Chat from '@/components/chat/Chat';
@@ -21,39 +21,69 @@ const NGTaxLandingPage = () => {
       description: "File your returns with FIRS seamlessly - Personal, Corporate, VAT, and all other tax types"
     },
     {
+      icon: <Send className="w-6 h-6" />,
+      title: "Bank Transfers",
+      description: "Send money to any Nigerian bank account instantly with AI-powered verification and tracking"
+    },
+    {
+      icon: <Link2 className="w-6 h-6" />,
+      title: "Payment Links",
+      description: "Generate shareable payment links to collect tax payments or business transactions easily"
+    },
+    {
+      icon: <Zap className="w-6 h-6" />,
+      title: "Instant Tax Payments",
+      description: "Pay FIRS directly via card, transfer, USSD, or bank with instant confirmation"
+    },
+    {
+      icon: <Smartphone className="w-6 h-6" />,
+      title: "Bill Payments",
+      description: "Pay utility bills, subscriptions, and airtime purchases - all while tracking for tax deductions"
+    },
+    {
+      icon: <CreditCard className="w-6 h-6" />,
+      title: "Virtual Accounts",
+      description: "Get dedicated virtual account numbers for easy tax payment collection and reconciliation"
+    },
+    {
       icon: <Clock className="w-6 h-6" />,
-      title: "Deadline Reminders",
-      description: "Never miss a deadline with proactive notifications and quarterly estimate tracking"
+      title: "Smart Reminders",
+      description: "Never miss a deadline with proactive notifications for tax filings and payment due dates"
     },
     {
       icon: <Shield className="w-6 h-6" />,
       title: "TCC Applications",
-      description: "Apply for Tax Clearance Certificates quickly and track your application status"
+      description: "Apply for Tax Clearance Certificates quickly and track your application status in real-time"
     },
     {
       icon: <TrendingUp className="w-6 h-6" />,
-      title: "Transaction Tracking",
-      description: "Monitor income and expenses with automatic tax-deductible categorization"
-    },
-    {
-      icon: <Zap className="w-6 h-6" />,
-      title: "Instant Payments",
-      description: "Make tax payments via card, transfer, USSD, or bank with instant confirmation"
+      title: "Financial Analytics",
+      description: "Track income, expenses, and tax obligations with AI-powered insights and categorization"
     },
     {
       icon: <BarChart3 className="w-6 h-6" />,
-      title: "Tax Analytics",
-      description: "Visualize your tax data with interactive charts and detailed reports"
+      title: "Tax Reports",
+      description: "Generate detailed tax reports and visualizations with interactive charts and exports"
     },
     {
       icon: <Globe className="w-6 h-6" />,
       title: "Multi-State Support",
-      description: "Handle taxes across multiple Nigerian states with ease"
+      description: "Manage taxes across all 36 Nigerian states from one unified dashboard"
     },
     {
       icon: <Receipt className="w-6 h-6" />,
-      title: "Receipt Management",
-      description: "Store and organize all your tax receipts and documents securely"
+      title: "Document Management",
+      description: "Store, organize and retrieve all tax receipts, invoices and documents securely in the cloud"
+    },
+    {
+      icon: <Wallet className="w-6 h-6" />,
+      title: "Expense Tracking",
+      description: "Automatically categorize business expenses for accurate tax deduction claims"
+    },
+    {
+      icon: <MessageCircle className="w-6 h-6" />,
+      title: "24/7 AI Assistant",
+      description: "Get instant answers to tax questions, filing guidance, and support anytime via chat"
     }
   ];
 
@@ -363,10 +393,10 @@ const NGTaxLandingPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Everything You Need for Tax Compliance
+              All Your Tax & Financial Needs in One Place
             </h2>
             <p className="text-xl text-gray-600">
-              Comprehensive tax management powered by AI
+              Taxes, payments, transfers, and more - all powered by AI
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
