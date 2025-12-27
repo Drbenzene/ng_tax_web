@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react';
-import { MessageCircle, Sparkles, Shield, Clock, FileText, Calculator, TrendingUp, CheckCircle, Menu, ChevronRight, Zap, Users, Award, Star, ArrowRight, Check, Play, BarChart3, Building2, User, Wallet, Globe, Lock, HeadphonesIcon, TrendingDown, AlertCircle, DollarSign, Receipt, BookOpen, Download, Paperclip, Mic, File, Loader2, X } from 'lucide-react';
+import { MonitorDot, MessageCircle, Sparkles, Shield, Clock, FileText, Calculator, TrendingUp, CheckCircle, Menu, ChevronRight, Zap, Users, Award, Star, ArrowRight, Check, Play, BarChart3, Building2, User, Wallet, Globe, Lock, HeadphonesIcon, TrendingDown, Receipt, BookOpen, Download, X } from 'lucide-react';
 import Faq from '@/components/landing/Faq';
 import Hero from '@/components/landing/Hero';
 import Chat from '@/components/chat/Chat';
@@ -140,7 +140,7 @@ const NGTaxLandingPage = () => {
 
   const stats = [
     { number: "10,000+", label: "Active Users", icon: <Users className="w-6 h-6" /> },
-    { number: "₦2.5B+", label: "Taxes Processed", icon: <DollarSign className="w-6 h-6" /> },
+    { number: "₦2.5B+", label: "Taxes Processed", icon: <MonitorDot className="w-6 h-6" /> },
     { number: "98%", label: "Accuracy Rate", icon: <CheckCircle className="w-6 h-6" /> },
     { number: "24/7", label: "AI Support", icon: <HeadphonesIcon className="w-6 h-6" /> }
   ];
@@ -242,7 +242,7 @@ const NGTaxLandingPage = () => {
               {[
                 { href: '#features', label: 'Features', icon: <Sparkles className="w-4 h-4" /> },
                 { href: '#how-it-works', label: 'How It Works', icon: <Zap className="w-4 h-4" /> },
-                { href: '#pricing', label: 'Pricing', icon: <DollarSign className="w-4 h-4" /> },
+                { href: '#pricing', label: 'Pricing', icon: <MonitorDot className="w-4 h-4" /> },
                 { href: '#testimonials', label: 'Reviews', icon: <Star className="w-4 h-4" /> }
               ].map((item, index) => (
                 <a
@@ -303,7 +303,7 @@ const NGTaxLandingPage = () => {
             {[
               { href: '#features', label: 'Features', icon: <Sparkles className="w-5 h-5" /> },
               { href: '#how-it-works', label: 'How It Works', icon: <Zap className="w-5 h-5" /> },
-              { href: '#pricing', label: 'Pricing', icon: <DollarSign className="w-5 h-5" /> },
+              { href: '#pricing', label: 'Pricing', icon: <MonitorDot className="w-5 h-5" /> },
               { href: '#testimonials', label: 'Reviews', icon: <Star className="w-5 h-5" /> }
             ].map((item, index) => (
               <a

@@ -171,20 +171,22 @@ export default function Hero() {
 
                     {/* User Message - Transfer */}
                     <div className="flex justify-end">
-                      <div className="bg-emerald-600 rounded-lg rounded-tr-sm px-3 py-2 shadow-sm max-w-[200px]">
-                        <p className="text-white text-xs">Transfer ₦5k to 0123456789 GTBank</p>
+                      <div className="bg-emerald-600 rounded-2xl rounded-tr-sm px-5 py-4 shadow-sm max-w-md">
+                        <p className="text-white">
+                          Transfer ₦5,000 to 0123456789 GTBank for my tax payment
+                        </p>
                       </div>
                     </div>
 
                     {/* AI Response - Transfer */}
-                    <div className="flex gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center flex-shrink-0">
-                        <span className="text-white font-bold text-xs">T</span>
+                    <div className="flex gap-4">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center flex-shrink-0">
+                        <span className="text-white font-bold text-sm">T</span>
                       </div>
-                      <div className="bg-white border border-gray-200 rounded-lg rounded-tl-sm px-3 py-2.5 shadow-sm max-w-xs">
-                        <div className="space-y-2">
-                          <p className="text-gray-800 font-semibold text-xs">Transfer Preview ✅</p>
-                          <div className="bg-gray-50 rounded p-2 space-y-0.5 text-[10px]">
+                      <div className="bg-white border border-gray-200 rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm max-w-lg">
+                        <div className="space-y-3">
+                          <p className="text-gray-800 font-semibold">Transfer Preview ✅</p>
+                          <div className="bg-gray-50 rounded-lg p-3 space-y-2 text-sm">
                             <div className="flex justify-between">
                               <span className="text-gray-600">To:</span>
                               <span className="font-semibold">0123456789</span>
@@ -198,11 +200,11 @@ export default function Hero() {
                               <span className="font-semibold">₦5,000</span>
                             </div>
                           </div>
-                          <div className="flex gap-1.5 pt-1">
-                            <button className="flex-1 bg-emerald-600 text-white py-1.5 px-2 rounded text-[10px] font-semibold">
+                          <div className="flex gap-2">
+                            <button className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-lg font-semibold text-sm">
                               Confirm
                             </button>
-                            <button className="flex-1 bg-gray-100 text-gray-700 py-1.5 px-2 rounded text-[10px] font-semibold">
+                            <button className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg font-semibold text-sm">
                               Cancel
                             </button>
                           </div>
@@ -212,28 +214,30 @@ export default function Hero() {
 
                     {/* User Message - Payment */}
                     <div className="flex justify-end">
-                      <div className="bg-emerald-600 rounded-lg rounded-tr-sm px-3 py-2 shadow-sm max-w-[200px]">
-                        <p className="text-white text-xs">Pay my ₦843,750 tax now</p>
+                      <div className="bg-emerald-600 rounded-2xl rounded-tr-sm px-5 py-4 shadow-sm max-w-md">
+                        <p className="text-white">
+                          Pay my ₦843,750 tax bill now
+                        </p>
                       </div>
                     </div>
 
                     {/* AI Response - Payment Success */}
-                    <div className="flex gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center flex-shrink-0">
-                        <span className="text-white font-bold text-xs">T</span>
+                    <div className="flex gap-4">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center flex-shrink-0">
+                        <span className="text-white font-bold text-sm">T</span>
                       </div>
-                      <div className="bg-white border border-emerald-100 rounded-lg rounded-tl-sm px-3 py-2.5 shadow-sm max-w-xs">
-                        <div className="space-y-1.5">
-                          <p className="text-gray-900 font-bold text-xs flex items-center gap-1.5">
-                            <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                      <div className="bg-white border-2 border-emerald-100 rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm max-w-lg">
+                        <div className="space-y-3">
+                          <p className="text-gray-900 font-bold flex items-center gap-2">
+                            <CheckCircle className="w-5 h-5 text-emerald-600" />
                             Payment Successful! 🎉
                           </p>
-                          <p className="text-gray-700 text-[11px]">
-                            ₦843,750 paid to FIRS via card •••• 4242
+                          <p className="text-gray-700">
+                            ₦843,750 paid to FIRS via card ending •••• 4242
                           </p>
-                          <div className="bg-emerald-50 rounded p-1.5">
-                            <p className="text-[10px] font-medium text-emerald-800">
-                              📧 Receipt sent • Ref: PAY-{Math.floor(Math.random() * 10000)}
+                          <div className="bg-emerald-50 rounded-lg p-3">
+                            <p className="text-sm font-medium text-emerald-800">
+                              📧 Receipt sent • Reference: PAY-{Math.floor(Math.random() * 10000)}
                             </p>
                           </div>
                         </div>
