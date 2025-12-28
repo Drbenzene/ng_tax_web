@@ -369,7 +369,7 @@ const NGTaxLandingPage = () => {
       </nav>
 
 
-<Hero/>
+<Hero setIsChatOpen={setIsChatOpen}/>
 
       {/* Stats Section */}
       <section className="py-16 bg-white border-y border-emerald-100">

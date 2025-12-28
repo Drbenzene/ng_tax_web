@@ -2,7 +2,10 @@
 
 import { ArrowRight, CheckCircle, Star, Play, MessageSquare, Calculator, Send, Sparkles } from 'lucide-react';
 
-export default function Hero() {
+interface IHero{
+  setIsChatOpen: any
+}
+export default function Hero({setIsChatOpen}: IHero) {
 
   return (
       <section className="relative pt-20 pb-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white">
@@ -39,11 +42,15 @@ export default function Hero() {
                 Start free trial
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
-              <button className="group flex items-center gap-2 text-gray-700 hover:text-emerald-600 px-6 py-4 font-semibold transition-colors">
+            <button
+              onClick={() => {
+                setIsChatOpen(true);
+              }}
+              className="group flex items-center gap-2 text-gray-700 hover:text-emerald-600 px-6 py-4 font-semibold transition-colors">
                 <div className="w-10 h-10 bg-gray-100 group-hover:bg-emerald-50 rounded-full flex items-center justify-center transition-colors">
                   <Play className="w-4 h-4 ml-0.5" />
                 </div>
-                Watch demo
+                Chat with TaxPadi
               </button>
             </div>
 
