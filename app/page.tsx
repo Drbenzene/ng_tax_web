@@ -479,7 +479,9 @@ const NGTaxLandingPage = () => {
                 <p className="text-gray-600 leading-relaxed">
                   {useCase.description}
                 </p>
-                <div className="mt-4 flex items-center text-emerald-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                <div
+                  onClick={() => setIsChatOpen(true)}
+                  className="mt-4 flex items-center text-emerald-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                   <span className="text-sm">Learn more</span>
                   <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                 </div>
