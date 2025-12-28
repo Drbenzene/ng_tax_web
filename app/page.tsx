@@ -7,7 +7,7 @@ import Hero from '@/components/landing/Hero';
 import Chat from '@/components/chat/Chat';
 const NGTaxLandingPage = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('individuals');
+  const [activeTab, setActiveTab] = useState<'individuals' | 'businesses'>('individuals');
 
   const features = [
     {

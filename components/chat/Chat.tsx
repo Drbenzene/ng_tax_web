@@ -386,8 +386,14 @@ export default function Chat({setIsChatOpen,isChatOpen }:IChat) {
 
                         <input
                             type="text"
-                            value={inputMessage}
-                            onChange={(e) => setInputMessage(e.target.value)}
+                            value={inputMessage}                
+                           onChange={(e) => setInputMessage(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleSendMessage();
+                                }
+                            }}
                             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                             placeholder="Welcome! How can i help you today"
                             className="flex-1 px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500"
