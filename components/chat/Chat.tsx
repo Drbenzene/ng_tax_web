@@ -90,7 +90,7 @@ export default function Chat({setIsChatOpen,isChatOpen }:IChat) {
   }, [messages]);
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim() && uploadedFiles.length === 0) return;
+    if (!inputMessage.trim() && !file) return;
 
     const timestamp = Date.now();
 
@@ -105,41 +105,32 @@ export default function Chat({setIsChatOpen,isChatOpen }:IChat) {
     }
 
     // Handle file uploads
-    if (uploadedFiles.length > 0) {
-      for (const file of uploadedFiles) {
-        try {
-          // Add file message to chat
-          const fileMessage: ChatMessage = {
+    if (file) {
+       const fileMessage: ChatMessage = {
             role: 'user',
-            content: `📎 Uploaded: ${file.name}`,
-            file: uploadedFiles[0],
+            content: `${inputMessage ? inputMessage : ""} 📎 Uploaded: ${file.name}`,
+            file: file,
             timestamp: timestamp + 1,
 
           };
           setMessages(prev => [...prev, fileMessage]);
-        } catch (error) {
-          console.error('File upload failed:', error);
-          const errorMessage: ChatMessage = {
-            role: 'assistant',
-            content: `Sorry, failed to upload ${file.name}. Please try again.`,
-            timestamp: Date.now(),
-          };
-          setMessages(prev => [...prev, errorMessage]);
-        }
-      }
     }
 
     const currentInput = inputMessage;
     setInputMessage('');
     setUploadedFiles([]);
-
+    setFile(null);
+    
     // Send message to AI API
-    if (currentInput.trim()) {
+    if (currentInput.trim() || file) {
       try {
-        const response = await sendMessageMutation.mutateAsync({
+        let payload:any = {
           message: currentInput,
-          file
-        });
+        }
+        if (file) {
+          payload.file = file
+        }
+        const response = await sendMessageMutation.mutateAsync(payload);
 
         // Add AI response to chat
         const assistantMessage: ChatMessage = {
@@ -187,41 +178,13 @@ export default function Chat({setIsChatOpen,isChatOpen }:IChat) {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         const audioFile = new File([audioBlob], `voice-${Date.now()}.webm`, { type: 'audio/webm' });
         
-        // Set the file for API upload
+        // Set the audio file to state
         setFile(audioFile);
-
-        try {
-          // Add voice message to chat
-          const voiceMessage: ChatMessage = {
-            role: 'user',
-            content: '🎤 Voice message',
-            timestamp: Date.now(),
-            file: audioFile
-          };
-          setMessages(prev => [...prev, voiceMessage]);
-
-          // Send to AI API
-          const response = await sendMessageMutation.mutateAsync({
-            message: '🎤 Voice message',
-            file: audioFile
-          });
-
-          // Add AI response to chat
-          const assistantMessage: ChatMessage = {
-            role: 'assistant',
-            content: response?.data?.response || 'I received your voice message.',
-            timestamp: Date.now(),
-          };
-          setMessages(prev => [...prev, assistantMessage]);
-        } catch (error) {
-          console.error('Voice upload failed:', error);
-          const errorMessage: ChatMessage = {
-            role: 'assistant',
-            content: 'Sorry, I had trouble processing your voice message. Please try again.',
-            timestamp: Date.now(),
-          };
-          setMessages(prev => [...prev, errorMessage]);
-        }
+        
+        // Add a small delay to ensure state is updated before calling handleSendMessage
+        setTimeout(() => {
+          handleSendMessage();
+        }, 100);
         
         stream.getTracks().forEach(track => track.stop());
       };
@@ -238,7 +201,6 @@ export default function Chat({setIsChatOpen,isChatOpen }:IChat) {
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
-      setFile(mediaRecorderRef.current)
       setIsRecording(false);
     }
   };
