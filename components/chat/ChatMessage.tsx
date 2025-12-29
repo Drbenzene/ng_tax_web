@@ -1,8 +1,26 @@
 'use client';
-import { FileText, File as FileIcon, Download, Image as ImageIcon } from 'lucide-react';
+import { FileText, File as FileIcon, Download, Image as ImageIcon, Maximize2 } from 'lucide-react';
 import type { ChatMessage, FileData } from '@/services/ai.service';
 import { useState, useMemo, useEffect } from 'react';
 import DOMPurify from 'dompurify';
+import dynamic from 'next/dynamic';
+
+// Dynamically import react-pdf components to prevent SSR issues
+const Document = dynamic(
+  () => import('react-pdf').then((mod) => mod.Document),
+  { ssr: false }
+);
+const Page = dynamic(
+  () => import('react-pdf').then((mod) => mod.Page),
+  { ssr: false }
+);
+
+// Configure PDF.js worker on client side only
+if (typeof window !== 'undefined') {
+  import('react-pdf').then((pdfjs) => {
+    pdfjs.pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.pdfjs.version}/build/pdf.worker.min.js`;
+  });
+}
 
 interface ChatMessageProps {
   message: ChatMessage;
@@ -14,6 +32,12 @@ export default function ChatMessageComponent({ message, index }: ChatMessageProp
   const [fileURL, setFileURL] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>('');
   const [fileType, setFileType] = useState<string>('');
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Ensure component is mounted (client-side only)
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Create file URL only on client side - handle both File objects and FileData
   useEffect(() => {
@@ -108,13 +132,58 @@ export default function ChatMessageComponent({ message, index }: ChatMessageProp
       );
     }
 
-    // PDF files - render PDF preview link
+    // PDF files - render PDF preview with inline viewer
     if (fileType === 'application/pdf') {
       return (
-        <div className="mt-2 bg-white/10 backdrop-blur rounded-lg p-3 border border-white/20">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 flex-1">
-              <FileText className="w-5 h-5 text-red-400" />
+        <div className="mt-2 bg-white/10 backdrop-blur rounded-lg border border-white/20 overflow-hidden">
+          {/* PDF Preview */}
+          <div className="relative group cursor-pointer" onClick={() => window.open(fileURL, '_blank')}>
+            {isMounted ? (
+              <Document
+                file={fileURL}
+                loading={
+                  <div className="flex items-center justify-center h-48 bg-white/5">
+                    <div className="text-sm opacity-70">Loading PDF...</div>
+                  </div>
+                }
+                error={
+                  <div className="flex items-center justify-center h-48 bg-white/5 p-6">
+                    <div className="flex flex-col items-center space-y-3">
+                      <FileText className="w-16 h-16 text-red-400" />
+                      <div className="text-center">
+                        <p className="text-sm font-medium">{fileName}</p>
+                        <p className="text-xs opacity-70 mt-1">PDF Preview Unavailable</p>
+                      </div>
+                    </div>
+                  </div>
+                }
+              >
+                <Page
+                  pageNumber={1}
+                  width={400}
+                  className="max-w-full"
+                  renderTextLayer={false}
+                  renderAnnotationLayer={false}
+                />
+              </Document>
+            ) : (
+              <div className="flex items-center justify-center h-48 bg-white/5">
+                <div className="text-sm opacity-70">Loading PDF...</div>
+              </div>
+            )}
+            {/* Hover overlay to indicate clickable */}
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+              <div className="bg-white/90 text-gray-900 px-4 py-2 rounded-lg flex items-center space-x-2 font-medium">
+                <Maximize2 className="w-4 h-4" />
+                <span>Open Full PDF</span>
+              </div>
+            </div>
+          </div>
+
+          {/* File Info and Actions */}
+          <div className="p-3 flex items-center justify-between border-t border-white/10">
+            <div className="flex items-center space-x-2 flex-1 min-w-0">
+              <FileText className="w-4 h-4 text-red-400 flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{fileName}</p>
                 <p className="text-xs opacity-70">PDF Document</p>
@@ -122,7 +191,10 @@ export default function ChatMessageComponent({ message, index }: ChatMessageProp
             </div>
             <div className="flex items-center space-x-2">
               <button
-                onClick={() => window.open(fileURL, '_blank')}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(fileURL, '_blank');
+                }}
                 className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded text-xs transition"
               >
                 View
@@ -130,6 +202,7 @@ export default function ChatMessageComponent({ message, index }: ChatMessageProp
               <a
                 href={fileURL}
                 download={fileName}
+                onClick={(e) => e.stopPropagation()}
                 className="p-1 hover:bg-white/20 rounded transition"
               >
                 <Download className="w-4 h-4" />
