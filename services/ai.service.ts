@@ -11,13 +11,13 @@ export interface ChatMessage {
     role: 'user' | 'assistant';
     content: string;
     timestamp?: number;
-    file?: File | FileData; // Support both File objects and serializable file data
+    file?: File | FileData;
+    fileType?: string;
 }
 
 export interface ChatRequest {
     message: string;
-    conversationHistory?: ChatMessage[];
-    file?: File;
+    files?: any[];
 }
 
 export interface ChatResponse {
@@ -30,7 +30,6 @@ export interface ChatResponse {
 // API Endpoints
 const ENDPOINTS = {
     CHAT: '/ai/chat',
-    FILE_UPLOAD: '/ai/upload',
 };
 
 // AI Service
@@ -40,36 +39,22 @@ export const aiService = {
      * Automatically uses FormData if file is present, otherwise sends JSON
      */
     sendMessage: async (request: ChatRequest): Promise<ChatResponse> => {
-        // If file is present, send as FormData
-        if (request.file) {
+        // If files are present, send as FormData
+        if (request.files && request.files.length > 0) {
             const formData = new FormData();
             formData.append('message', request.message);
-            formData.append('file', request.file);
+            request.files.forEach((file: File) => {
+                formData.append('files', file);
+            });
+
+            console.log('Sending FormData with files:', request.files.length);
             return api.upload<ChatResponse>(ENDPOINTS.CHAT, formData);
         }
 
         // Otherwise send as regular JSON
         return api.post<ChatResponse>(ENDPOINTS.CHAT, request);
     },
-    /**
-     * Upload document for processing
-     */
-    uploadDocument: async (
-        file: File,
-        onProgress?: (progress: number) => void
-    ): Promise<any> => {
-        const formData = new FormData();
-        formData.append('file', file);
 
-        return api.upload(ENDPOINTS.FILE_UPLOAD, formData, (progressEvent) => {
-            if (onProgress && progressEvent.total) {
-                const percentCompleted = Math.round(
-                    (progressEvent.loaded * 100) / progressEvent.total
-                );
-                onProgress(percentCompleted);
-            }
-        });
-    },
 };
 
 export default aiService;

@@ -22,7 +22,9 @@
     "next": "16.1.1",
     "postcss": "^8.5.6",
     "react": "19.2.3",
+    "react-audio-voice-recorder": "^2.2.0",
     "react-dom": "19.2.3",
+    "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.69.0",
     "yup": "^1.7.1"
   },

@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useSendMessage } from '@/hooks/useAI';
 import type { ChatMessage, FileData } from '@/services/ai.service';
 import ChatMessageComponent from './ChatMessage';
+import FileUploadZone from './FileUploadZone';
+import AudioRecorderModal from './AudioRecorderModal';
 
 interface IChat{
   isChatOpen: boolean;
@@ -18,6 +20,81 @@ const fileToBase64 = (file: File): Promise<string> => {
     reader.onload = () => resolve(reader.result as string);
     reader.onerror = error => reject(error);
   });
+};
+
+// Utility function to convert audio blob to WAV format
+const convertToWav = async (audioBlob: Blob): Promise<Blob> => {
+  const arrayBuffer = await audioBlob.arrayBuffer();
+  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+  
+  // Convert to WAV
+  const wavBuffer = audioBufferToWav(audioBuffer);
+  return new Blob([wavBuffer], { type: 'audio/wav' });
+};
+
+// Convert AudioBuffer to WAV format
+const audioBufferToWav = (buffer: AudioBuffer): ArrayBuffer => {
+  const length = buffer.length * buffer.numberOfChannels * 2 + 44;
+  const arrayBuffer = new ArrayBuffer(length);
+  const view = new DataView(arrayBuffer);
+  const channels: Float32Array[] = [];
+  let offset = 0;
+  let pos = 0;
+
+  // Write WAV header
+  const setUint16 = (data: number) => {
+    view.setUint16(pos, data, true);
+    pos += 2;
+  };
+  const setUint32 = (data: number) => {
+    view.setUint32(pos, data, true);
+    pos += 4;
+  };
+
+  // RIFF identifier
+  setUint32(0x46464952);
+  // file length
+  setUint32(length - 8);
+  // RIFF type
+  setUint32(0x45564157);
+  // format chunk identifier
+  setUint32(0x20746d66);
+  // format chunk length
+  setUint32(16);
+  // sample format (raw)
+  setUint16(1);
+  // channel count
+  setUint16(buffer.numberOfChannels);
+  // sample rate
+  setUint32(buffer.sampleRate);
+  // byte rate (sample rate * block align)
+  setUint32(buffer.sampleRate * buffer.numberOfChannels * 2);
+  // block align (channel count * bytes per sample)
+  setUint16(buffer.numberOfChannels * 2);
+  // bits per sample
+  setUint16(16);
+  // data chunk identifier
+  setUint32(0x61746164);
+  // data chunk length
+  setUint32(length - pos - 4);
+
+  // Write interleaved data
+  for (let i = 0; i < buffer.numberOfChannels; i++) {
+    channels.push(buffer.getChannelData(i));
+  }
+
+  while (pos < length) {
+    for (let i = 0; i < buffer.numberOfChannels; i++) {
+      let sample = channels[i][offset];
+      sample = Math.max(-1, Math.min(1, sample));
+      view.setInt16(pos, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
+      pos += 2;
+    }
+    offset++;
+  }
+
+  return arrayBuffer;
 };
 
 // Utility function to serialize messages for localStorage
@@ -57,21 +134,17 @@ export default function Chat({setIsChatOpen,isChatOpen }:IChat) {
       }
     ];
   });
-  const [file,setFile] = useState<any>()
+  const [files,setFiles] = useState<any>()
 
   const [inputMessage, setInputMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [showAttachMenu, setShowAttachMenu] = useState(false);
+  const [showFileUpload, setShowFileUpload] = useState(false);
+  const [showRecordingModal, setShowRecordingModal] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
 
-  // API Hooks
   const sendMessageMutation = useSendMessage();
   
-  // Save messages to localStorage whenever they change (client-side only)
   useEffect(() => {
     if (typeof window !== 'undefined' && messages.length > 0) {
       // Serialize messages with files converted to base64
@@ -90,7 +163,8 @@ export default function Chat({setIsChatOpen,isChatOpen }:IChat) {
   }, [messages]);
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim() && !file) return;
+
+    if (!inputMessage.trim() && !files) return;
 
     const timestamp = Date.now();
 
@@ -104,31 +178,40 @@ export default function Chat({setIsChatOpen,isChatOpen }:IChat) {
       setMessages(prev => [...prev, userMessage]);
     }
 
-    // Handle file uploads
-    if (file) {
-       const fileMessage: ChatMessage = {
-            role: 'user',
-            content: `${inputMessage ? inputMessage : ""} 📎 Uploaded: ${file.name}`,
-            file: file,
-            timestamp: timestamp + 1,
-
-          };
-          setMessages(prev => [...prev, fileMessage]);
+    if (files && files.length > 0) {
+    const fileMessages = await Promise.all(
+          files.map(async (file: File, index: number) => {
+            const base64 = await fileToBase64(file);
+            const fileData: FileData = {
+              name: file.name,
+              type: file.type,
+              data: base64
+            };
+            return {
+              role: 'user' as const,
+              content: `📎 Uploaded: ${file.name}`,
+              file: fileData,
+              timestamp: timestamp + index + 1,
+            };
+          })
+        );
+    setMessages(prev => [...prev, ...fileMessages]);
     }
+
 
     const currentInput = inputMessage;
     setInputMessage('');
     setUploadedFiles([]);
-    setFile(null);
+    setShowFileUpload(false);
+    setFiles(null);
     
-    // Send message to AI API
-    if (currentInput.trim() || file) {
+    if (currentInput.trim() || files) {
       try {
         let payload:any = {
           message: currentInput,
         }
-        if (file) {
-          payload.file = file
+        if (files) {
+          payload.files = files
         }
         const response = await sendMessageMutation.mutateAsync(payload);
 
@@ -137,6 +220,7 @@ export default function Chat({setIsChatOpen,isChatOpen }:IChat) {
           role: 'assistant',
           content: response?.data?.response,
           timestamp: Date.now(),
+          fileType: 'text',
         };
         setMessages(prev => [...prev, assistantMessage]);
       } catch (error) {
@@ -151,58 +235,27 @@ export default function Chat({setIsChatOpen,isChatOpen }:IChat) {
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setFile(files[0])
-    setUploadedFiles(prev => [...prev, ...files]);
-    setShowAttachMenu(false);
-  };
+  const handleAudioFromModal = async (audioFile: File) => {
+    console.log('Audio received from modal:', {
+      name: audioFile.name,
+      type: audioFile.type,
+      size: audioFile.size
+    });
 
-  const removeFile = (index: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data);
-      };
-
-
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        const audioFile = new File([audioBlob], `voice-${Date.now()}.webm`, { type: 'audio/webm' });
-        
-        // Set the audio file to state
-        setFile(audioFile);
-        
-        // Add a small delay to ensure state is updated before calling handleSendMessage
-        setTimeout(() => {
-          handleSendMessage();
-        }, 100);
-        
-        stream.getTracks().forEach(track => track.stop());
-      };
-
-      mediaRecorder.start();
-      setIsRecording(true);
-      setShowAttachMenu(false);
-    } catch (error) {
-      console.error('Error accessing microphone:', error);
-      alert('Could not access microphone. Please check permissions.');
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-    }
+      console.log('Converting to WAV format...');
+      const arrayBuffer = await audioFile.arrayBuffer();
+      const audioBlob = new Blob([arrayBuffer], { type: audioFile.type });
+      const wavBlob = await convertToWav(audioBlob);
+      const wavFile = new File([wavBlob], `voice-${Date.now()}.wav`, { type: 'audio/wav' });
+      
+      console.log('WAV conversion successful:', {
+        name: wavFile.name,
+        type: wavFile.type,
+        size: wavFile.size
+      });
+      setFiles([wavFile]);
+      
+    handleSendMessage();
   };
 
   const clearChatHistory = () => {
@@ -266,82 +319,39 @@ export default function Chat({setIsChatOpen,isChatOpen }:IChat) {
                     <div ref={messagesEndRef} />
                 </div>
 
-                {/* File Upload Preview */}
-                {uploadedFiles.length > 0 && (
-                    <div className="px-4 py-2 border-t border-gray-200 bg-white">
-                        <div className="flex flex-wrap gap-2">
-                            {uploadedFiles.map((file, index) => (
-                                <div key={index} className="flex items-center space-x-2 bg-emerald-50 rounded-lg px-3 py-2 text-sm">
-                                    {file.type.startsWith('image/') ? (
-                                        <FileText className="w-4 h-4 text-emerald-600" />
-                                    ) : file.type.startsWith('audio/') ? (
-                                        <Mic className="w-4 h-4 text-emerald-600" />
-                                    ) : (
-                                        <FileIcon className="w-4 h-4 text-emerald-600" />
-                                    )}
-                                    <span className="text-gray-700 max-w-[120px] truncate">{file.name}</span>
-                                    <button
-                                        onClick={() => removeFile(index)}
-                                        className="text-gray-500 hover:text-red-600 transition"
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
+
 
                 {/* Chat Input */}
-                <div className="p-4 border-t border-gray-200">
+                <div className="p-4 border-t border-gray-200 relative">
+                    {/* File Upload Zone */}
+                    {showFileUpload && (
+                        <FileUploadZone
+                            files={uploadedFiles}
+                            onFilesChange={(files) => {
+                                setUploadedFiles(files);
+                                setFiles(files);
+                            }}
+                            onClose={() => setShowFileUpload(false)}
+                        />
+                    )}
+
                     <div className="flex items-center space-x-2">
-                        {/* Attach Menu */}
-                        <div className="relative">
-                            <button
-                                onClick={() => setShowAttachMenu(!showAttachMenu)}
-                                className="text-gray-500 hover:text-emerald-600 p-2 rounded-full hover:bg-emerald-50 transition"
-                            >
-                                <Paperclip className="w-5 h-5" />
-                            </button>
-                
-                            {showAttachMenu && (
-                                <div className="absolute bottom-full left-0 mb-2 bg-white rounded-xl shadow-xl border border-gray-200 p-2 w-48">
-                                    <button
-                                        onClick={() => fileInputRef.current?.click()}
-                                        className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-emerald-50 transition text-left"
-                                    >
-                                        <FileIcon className="w-5 h-5 text-emerald-600" />
-                                        <span className="text-gray-700">Upload File</span>
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            fileInputRef.current?.click();
-                                        }}
-                                        className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-emerald-50 transition text-left"
-                                    >
-                                        <FileText className="w-5 h-5 text-emerald-600" />
-                                        <span className="text-gray-700">Upload Image</span>
-                                    </button>
-                                </div>
-                            )}
-                
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                multiple
-                                accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,audio/*,.mp3,.wav,.m4a,.ogg"
-                                onChange={handleFileUpload}
-                                className="hidden"
-                            />
-                        </div>
+                        {/* Attach Button */}
+                        <button
+                            onClick={() => setShowFileUpload(!showFileUpload)}
+                            className={`p-2 rounded-full transition ${
+                                showFileUpload
+                                    ? 'bg-emerald-100 text-emerald-600'
+                                    : 'text-gray-500 hover:text-emerald-600 hover:bg-emerald-50'
+                            }`}
+                        >
+                            <Paperclip className="w-5 h-5" />
+                        </button>
 
                         {/* Voice Recording Button */}
                         <button
-                            onClick={isRecording ? stopRecording : startRecording}
-                            className={`p-2 rounded-full transition ${isRecording
-                                    ? 'bg-red-500 text-white animate-pulse'
-                                    : 'text-gray-500 hover:text-emerald-600 hover:bg-emerald-50'
-                                }`}
+                            onClick={() => setShowRecordingModal(true)}
+                            className="p-2 rounded-full transition text-gray-500 hover:text-emerald-600 hover:bg-emerald-50"
                         >
                             <Mic className="w-5 h-5" />
                         </button>
@@ -363,7 +373,7 @@ export default function Chat({setIsChatOpen,isChatOpen }:IChat) {
                         />
               
                         <button
-                            onClick={handleSendMessage}
+                            onClick={() =>handleSendMessage()}
                             disabled={!inputMessage.trim() && uploadedFiles.length === 0}
                             className="bg-gradient-to-r from-emerald-600 to-green-600 text-white p-3 rounded-full hover:shadow-lg transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                         >
@@ -371,12 +381,12 @@ export default function Chat({setIsChatOpen,isChatOpen }:IChat) {
                         </button>
                     </div>
             
-                    {isRecording && (
-                        <div className="mt-2 flex items-center justify-center space-x-2 text-red-600 text-sm">
-                            <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
-                            <span>Recording... Click mic to stop</span>
-                        </div>
-                    )}
+                    {/* Audio Recording Modal */}
+                    <AudioRecorderModal
+                        isOpen={showRecordingModal}
+                        onClose={() => setShowRecordingModal(false)}
+                        onSend={handleAudioFromModal}
+                    />
                 </div>
             </div>        </div>
     )
